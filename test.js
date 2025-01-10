@@ -20,6 +20,7 @@ function getParams(){
     let obj = $request.url.split('?')[1];
     let kdtid = obj.kdt_id;
     let accessToken = obj.access_token;
+    console.log(`获取KDTID及ACCESSTOKEN成功:${accessToken}`);
     Write_PeristentStore('AMAZFIT_KDTID',kdtid);
     Write_PeristentStore("AMAZFIT_ACCESSTOKEN",accessToken);
     sendMsg(`获取KDTID及ACCESSTOKEN成功:${Read_PeristentStore('AMAZFIT_ACCESSTOKEN')}`)
