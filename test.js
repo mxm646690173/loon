@@ -22,6 +22,7 @@ function getParams(){
     let accessToken = obj.access_token;
     Write_PeristentStore('AMAZFIT_KDTID',kdtid);
     Write_PeristentStore("AMAZFIT_ACCESSTOKEN",accessToken);
+    sendMsg(`获取KDTID及ACCESSTOKEN成功:${Read_PeristentStore('AMAZFIT_ACCESSTOKEN')}`)
 }
 
 async function main(){
