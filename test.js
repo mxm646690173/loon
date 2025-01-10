@@ -19,8 +19,9 @@ $.messages = [];
 function getParams(){
     let obj = $request.url.split('?')[1];
     $notification.post('步骤1',`${obj}`);
-    let kdtid = obj.kdt_id;
-    let accessToken = obj.access_token;
+    let params = new URLSearchParams(obj);
+    let kdtid = params.get('kdt_id');
+    let accessToken = params.get("access_token");
     Write_PeristentStore('AMAZFIT_KDTID',kdtid);
     Write_PeristentStore("AMAZFIT_ACCESSTOKEN",accessToken);
     $notification.post('Amazfit','数据获取成功',accessToken);
