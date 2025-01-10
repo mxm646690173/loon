@@ -8,4 +8,4 @@ function Notify_Demo()
     $notification.post(Title,SubTitle,Content);
 }
 
-Notify_Demo
+Notify_Demo()
