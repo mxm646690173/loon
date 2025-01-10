@@ -18,7 +18,6 @@ $.messages = [];
 
 function getParams(){
     let obj = $request.url.split('?')[1];
-    $notification.post('步骤1',`${obj}`);
     let params = new URLSearchParams(obj);
     let kdtid = params.get('kdt_id');
     let accessToken = params.get("access_token");
@@ -57,7 +56,7 @@ if (typeof $request !== `undefined`) {
   //存储
   function Write_PeristentStore(key,value)//写入存储区
 {
-    $.setdata(value,key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
+    $.setdata($.toStr(value),key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
 }
 
 
