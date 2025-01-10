@@ -17,8 +17,6 @@ $.messages = [];
 // }
 
 function getParams(){
-    $notification.post('开始获取数据',`${$request.url}`);
-
     let obj = $request.url.split('?')[1];
     $notification.post('步骤1',`${obj}`);
     let kdtid = obj.kdt_id;
@@ -51,14 +49,14 @@ if (typeof $request !== `undefined`) {
   function Read_PeristentStore(key)//读取写入的数据
 {
     var ReadKey = key;//上一个API写入数据的KEY名称
-    var ReadResult = $peristentStore.read(ReadKey);
+    var ReadResult = $.getdata(ReadKey);
     return ReadResult
 }
 
   //存储
   function Write_PeristentStore(key,value)//写入存储区
 {
-    $peristentStore.write(value,key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
+    $.setdata(value,key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
 }
 
 
