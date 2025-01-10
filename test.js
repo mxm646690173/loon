@@ -17,6 +17,7 @@ $.messages = [];
 // }
 
 function getParams(){
+    $notification.post('开始获取数据','');
     let obj = $request.url.split('?')[1];
     let kdtid = obj.kdt_id;
     let accessToken = obj.access_token;
