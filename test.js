@@ -5,6 +5,7 @@ function Notify_Demo()
     TItle = "我是主标题";
     SubTitle  = "我是子标题";
     Content = $request;
+    console.log($request);
     $notification.post(Title,SubTitle,Content);
 }
 
