@@ -21,13 +21,13 @@ function getParams(){
     let params = new URLSearchParams(obj);
     let kdtid = params.get('kdt_id');
     let accessToken = params.get("access_token");
-    Write_PeristentStore('AMAZFIT_KDTID',kdtid);
-    Write_PeristentStore("AMAZFIT_ACCESSTOKEN",accessToken);
-    $notification.post('Amazfit','数据获取成功',accessToken);
+    $.setdata('AMAZFIT_KDTID',kdtid);
+    $.setdata("AMAZFIT_ACCESSTOKEN",accessToken);
+    $notification.post('Amazfit','数据获取成功',$.getdata("AMAZFIT_ACCESSTOKEN"));
 }
 
 async function main(){
-    console.log(`accessToken为：${Read_PeristentStore(AMAZFIT_ACCESSTOKEN)}`);
+    console.log(`accessToken为：${$.getdata("AMAZFIT_ACCESSTOKEN")}`);
 }
 
 // 脚本执行入口
@@ -45,19 +45,19 @@ if (typeof $request !== `undefined`) {
       })
   }
 
-  //读取
-  function Read_PeristentStore(key)//读取写入的数据
-{
-    var ReadKey = key;//上一个API写入数据的KEY名称
-    var ReadResult = $.getdata(ReadKey);
-    return ReadResult
-}
+//   //读取
+//   function Read_PeristentStore(key)//读取写入的数据
+// {
+//     var ReadKey = key;//上一个API写入数据的KEY名称
+//     var ReadResult = $.getdata(ReadKey);
+//     return ReadResult
+// }
 
-  //存储
-  function Write_PeristentStore(key,value)//写入存储区
-{
-    $.setdata($.toStr(value),key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
-}
+//   //存储
+//   function Write_PeristentStore(key,value)//写入存储区
+// {
+//     $.setdata($.toStr(value),key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
+// }
 
 
   /**
