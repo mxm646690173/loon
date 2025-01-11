@@ -10,9 +10,9 @@
 hostname = *.youzan.com
 
 [Script]
-http-request ^https:\/\/h5\.youzan\.com\/wscuser\/membercenter\/init-data\.json tag=Amazfit#, script-path= ,requires-body=0
+http-request ^https:\/\/h5\.youzan\.com\/wscuser\/membercenter\/init-data\.json tag=Amazfit#, script-path= https://raw.githubusercontent.com/mxm646690173/loon/refs/heads/main/test.js,requires-body=0
 
-cron "17 7 * * *" script-path=,tag = Amazfit,enable=true
+cron "17 7 * * *" script-path=https://raw.githubusercontent.com/mxm646690173/loon/refs/heads/main/test.js,tag = Amazfit,enable=true
 
  */
 const $ = new Env('Amazfit');
