@@ -1,33 +1,93 @@
+/**
+ * 脚本名称：Amazfit
+ * 活动规则：每日签到可获取积分奖励
+ * 脚本说明：添加重写进入Amazfit小程序我的页面即可获取 accessToken 环境。
+ * 郑重声明：此脚本仅做技术交流，请勿滥用传播
+ * 更新时间：2025-01-10
+------------------ Loon 配置 ------------------
+
+[MITM]
+hostname = *.youzan.com
+
+[Script]
+http-request ^https:\/\/h5\.youzan\.com\/wscuser\/membercenter\/init-data\.json tag=Amazfit#, script-path= ,requires-body=0
+
+cron "17 7 * * *" script-path=,tag = Amazfit,enable=true
+
+ */
 const $ = new Env('Amazfit');
 $.is_debug = ($.isNode() ? process.env['IS_DEDUG'] : $.getdata('is_debug')) || 'false';  // 调试模式
-$.appid = 'wxdc6539f76ccaaca6';  // 小程序 appId
-$.kdtid = '17817733';
-$.accessToken = ($.isNode() ? process.env['AMAZFIT_ACCESSTOKEN'] : $.getdata('amazfit_access_token')) || '';  // access_token
+$.appid = $.getdata('AMAZFIT_APPID') || 'wxdc6539f76ccaaca6';  // 小程序 appId
+$.kdtid = $.getdata("AMAZFIT_KDTID") || '17817733';
+$.accessToken = ($.isNode() ? process.env['AMAZFIT_ACCESSTOKEN'] : $.getdata('AMAZFIT_ACCESSTOKEN')) || '';  // access_token
 $.checkinId = '2517973';
-$.messages = [];
-
-// function Notify_Demo()
-// {
-//     var Title,SubTitle,Content;
-//     Title = "我是主标题";
-//     SubTitle  = "我是子标题";
-//     Content = $request;
-//     console.log($request);
-//     $notification.post(Title,SubTitle,Content);
-// }
+$.extra_Data =  $.getdata('AMAZFIT_EXTRA_DATA') || '';
+$.UserAgent='Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.53(0x18003531) NetType/WIFI Language/zh_CN';
+$.needConsumptionAboveCoupon = '1';
+$.version = $.getdata('AMAZFIT_VERSION') || '2.164.10.101';
+$.onlineKdtId = $.getdata('AMAZFIT_ONLINEKDTID') || $.kdtid;
+$.currentKdtId = $.getdata('AMAZFIT_CURRENTKDID') || $.kdtid;
 
 function getParams(){
     let obj = $request.url.split('?')[1];
     let params = new URLSearchParams(obj);
     let kdtid = params.get('kdt_id');
     let accessToken = params.get("access_token");
-    $.setdata('AMAZFIT_KDTID',kdtid);
-    $.setdata("AMAZFIT_ACCESSTOKEN",accessToken);
+    let app_id = params.get('app_id');
+    let version = params.get('version');
+    let onlineKdtId = params.get('onlineKdtId');
+    let currentKdtId = params.get('currentKdtId');
+    let extra_data = $request.headers['extra-data'];
+    $.setdata(extra_data,'AMAZFIT_EXTRA_DATA');
+    $.setdata(app_id,'AMAZFIT_APPID');
+    $.setdata(version,'AMAZFIT_VERSION');
+    $.setdata(onlineKdtId,'AMAZFIT_ONLINEKDTID');
+    $.setdata(currentKdtId,'AMAZFIT_CURRENTKDID');
+    $.setdata(kdtid,'AMAZFIT_KDTID');
+    $.setdata(accessToken,"AMAZFIT_ACCESSTOKEN");
     $notification.post('Amazfit','数据获取成功',$.getdata("AMAZFIT_ACCESSTOKEN"));
 }
 
 async function main(){
-    console.log(`accessToken为：${$.getdata("AMAZFIT_ACCESSTOKEN")}`);
+    console.log("AMAZFIT签到开始执行...");
+    let msg = '';
+    let opt = {
+      url: `https://h5.youzan.com/wscump/checkin/checkinV2.json?checkinId=${$.checkinId}&app_id=${$.appid}&kdt_id=${$.kdtid}&access_token=${$.accessToken}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'Extra-Data':JSON.parse($.extra_Data),
+        'User-Agent':$.UserAgent,
+        'Host':'h5.youzan.com',
+        'Referer:':'https://servicewechat.com/wxdc6539f76ccaaca6/177/page-frame.html'
+      },
+      _method:"get"
+    };
+    var result = await Request(opt);
+    console.log(result)
+    if (result.code != 0&&result.code != '1000030071') {
+      $notification.post('Amazfit',result.msg,'');
+    } else {
+      // $notification.post('Amazfit','签到成功','');
+      await getPoints()
+    }
+}
+
+async function getPoints(){
+  let opt = {
+    url: `https://h5.youzan.com/wscuser/membercenter/init-data.json?kdt_id=${$.kdtid}&app_id=${$.appid}&access_token=${$.accessToken}&version=${$.version}&kdtId=${$.kdtid}&onlineKdtId=${$.onlineKdtId}&currentKdtId=${$.currentKdtId}&needConsumptionAboveCoupon=${$.needConsumptionAboveCoupon}`,
+    headers: {
+      'Content-Type': 'application/json',
+      'Extra-Data':JSON.parse($.extra_Data),
+      'User-Agent':$.UserAgent,
+    },
+    _method:"get"
+  };
+
+  var result = await Request(opt);
+  if (result.code == 0) {
+    console.log(`当前积分：${result.data.member.stats.points}`);
+    $notification.post('Amazfit','签到成功',`当前积分：${result.data.member.stats.points}`);
+  }
 }
 
 // 脚本执行入口
@@ -44,20 +104,6 @@ if (typeof $request !== `undefined`) {
         $.done();
       })
   }
-
-//   //读取
-//   function Read_PeristentStore(key)//读取写入的数据
-// {
-//     var ReadKey = key;//上一个API写入数据的KEY名称
-//     var ReadResult = $.getdata(ReadKey);
-//     return ReadResult
-// }
-
-//   //存储
-//   function Write_PeristentStore(key,value)//写入存储区
-// {
-//     $.setdata($.toStr(value),key);//参数分别代表:写入的数据,数据存储的Key名称，用于取出数据
-// }
 
 
   /**
@@ -114,6 +160,55 @@ async function sendMsg(message) {
       $.log(`\n\n----- ${$.name} -----\n${message}`);
     }
   }
+
+  /**
+ * 请求函数二次封装
+ * @param {(object|string)} options - 构造请求内容，可传入对象或 Url
+ * @returns {(object|string)} - 根据 options['respType'] 传入的 {status|headers|rawBody} 返回对象或字符串，默认为 body
+ */
+async function Request(options) {
+  try {
+    options = options.url ? options : { url: options };
+    const _method = options?._method || ('body' in options ? 'post' : 'get');
+    const _respType = options?._respType || 'body';
+    const _timeout = options?._timeout || 15e3;
+    const _http = [
+      new Promise((_, reject) => setTimeout(() => reject(`❌ 请求超时： ${options['url']}`), _timeout)),
+      new Promise((resolve, reject) => {
+        debug(options, '[Request]');
+        $[_method.toLowerCase()](options, (error, response, data) => {
+          debug(response, '[response]');
+          error && $.log($.toStr(error));
+          if (_respType !== 'all') {
+            resolve($.toObj(response?.[_respType], response?.[_respType]));
+          } else {
+            resolve(response);
+          }
+        })
+      })
+    ];
+    return await Promise.race(_http);
+  } catch (err) {
+    $.logErr(err);
+  }
+}
+
+/**
+ * DEBUG
+ * @param {*} content - 传入内容
+ * @param {*} title - 标题
+ */
+function debug(content, title = "debug") {
+  let start = `\n----- ${title} -----\n`;
+  let end = `\n----- ${$.time('HH:mm:ss')} -----\n`;
+  if ($.is_debug === 'true') {
+    if (typeof content == "string") {
+      $.log(start + content + end);
+    } else if (typeof content == "object") {
+      $.log(start + $.toStr(content) + end);
+    }
+  }
+}
 
 
   // prettier-ignore
